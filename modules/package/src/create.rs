@@ -1,5 +1,5 @@
 use crate::defs::{Id, Item, MAGIC};
-use crate::error::{Error, OtherError};
+use crate::error::{OtherError, Result};
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Read, Write};
 use std::path::{Path, PathBuf};
@@ -21,7 +21,7 @@ impl CreatePackage {
         CreatePackage::default()
     }
 
-    pub fn from_list<S: AsRef<Path> + Copy>(filename: S) -> Result<CreatePackage, Error> {
+    pub fn from_list<S: AsRef<Path> + Copy>(filename: S) -> Result<CreatePackage> {
         let file = File::open(filename)?;
         let mut reader = BufReader::new(file);
         let mut buffer = String::new();
@@ -46,7 +46,7 @@ impl CreatePackage {
         self.files.push(Item::new(id, filename));
     }
 
-    pub fn pack<S: AsRef<Path>>(self, filename: S) -> Result<(), Error> {
+    pub fn pack<S: AsRef<Path>>(self, filename: S) -> Result<()> {
         // magic (4 bytes)
         let mut header = Vec::from(MAGIC);
         let mut data = Vec::new();

@@ -1,5 +1,5 @@
 use crate::defs::*;
-use crate::error::{Error, OtherError};
+use crate::error::{OtherError, Result};
 use std::fs::File;
 use std::io::{BufReader, Read};
 use std::path::Path;
@@ -10,7 +10,7 @@ pub struct LoadPackage {
 }
 
 impl LoadPackage {
-    pub fn from_file<S: AsRef<Path>>(filename: S) -> Result<LoadPackage, Error> {
+    pub fn from_file<S: AsRef<Path>>(filename: S) -> Result<LoadPackage> {
         let file = File::open(filename)?;
         let mut reader = BufReader::new(file);
         let mut buffer = Vec::new();
