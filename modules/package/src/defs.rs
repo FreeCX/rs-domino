@@ -1,6 +1,6 @@
 pub type Id = u16;
 
-pub static MAGIC: &'static str = "PAKE";
+pub static MAGIC: &str = "PAKE";
 pub static MINIMAL_HEADER_LEN: usize = MAGIC.len();
 pub static COUNTER_LEN: usize = 4;
 pub static SIZES_LEN: usize = 8;

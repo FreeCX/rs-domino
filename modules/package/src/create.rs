@@ -4,16 +4,10 @@ use std::fs::File;
 use std::io::{BufReader, BufWriter, Read, Write};
 use std::path::{Path, PathBuf};
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct CreatePackage {
     files: Vec<Item>,
     parent: String,
-}
-
-impl Default for CreatePackage {
-    fn default() -> Self {
-        CreatePackage { files: Vec::new(), parent: String::new() }
-    }
 }
 
 impl CreatePackage {
@@ -27,12 +21,14 @@ impl CreatePackage {
         let mut buffer = String::new();
         reader.read_to_string(&mut buffer)?;
 
-        let mut package = CreatePackage::default();
-        package.parent = filename.as_ref().parent().ok_or_else(|| OtherError::EmptyParentPath)?.display().to_string();
+        let mut package = CreatePackage {
+            parent: filename.as_ref().parent().ok_or(OtherError::EmptyParentPath)?.display().to_string(),
+            ..Default::default()
+        };
         for (index, line) in buffer.lines().enumerate() {
             let mut tokens = line.split_whitespace();
-            let identifier = tokens.next().ok_or_else(|| OtherError::IncorrectFormat(index))?;
-            let filename = tokens.next().ok_or_else(|| OtherError::IncorrectFormat(index))?;
+            let identifier = tokens.next().ok_or_else(|| OtherError::IncorrectFormat(index + 1))?;
+            let filename = tokens.next().ok_or_else(|| OtherError::IncorrectFormat(index + 1))?;
             package.add(identifier, filename);
         }
         Ok(package)
