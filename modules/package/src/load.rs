@@ -2,12 +2,11 @@ use crate::defs::*;
 use crate::error::{Error, OtherError};
 use std::fs::File;
 use std::io::{BufReader, Read};
-use std::ops::Index;
 use std::path::Path;
 
 #[derive(Debug)]
 pub struct LoadPackage {
-    items: Vec<Vec<u8>>,
+    items: Vec<Option<Vec<u8>>>,
 }
 
 impl LoadPackage {
@@ -27,14 +26,14 @@ impl LoadPackage {
         }
 
         // files count
-        let count = u32::from_be_bytes(buffer[MINIMAL_HEADER_LEN..MINIMAL_HEADER_LEN + COUNTER_LEN].try_into().unwrap())
-            as usize;
+        let count =
+            u32::from_be_bytes(buffer[MINIMAL_HEADER_LEN..MINIMAL_HEADER_LEN + COUNTER_LEN].try_into()?) as usize;
         let mut sizes = Vec::new();
         let mut total_size = 0;
         for i in 0..count {
             let start = SIZES_LEN * (i + 1);
             let end = start + SIZES_LEN;
-            let size = u64::from_be_bytes(buffer[start..end].try_into().unwrap()) as usize;
+            let size = u64::from_be_bytes(buffer[start..end].try_into()?) as usize;
             sizes.push(size);
             total_size += size;
         }
@@ -49,7 +48,7 @@ impl LoadPackage {
         // data
         let mut items = Vec::new();
         for size in sizes {
-            items.push(Vec::from(&buffer[skip..skip + size]));
+            items.push(Some(Vec::from(&buffer[skip..skip + size])));
             skip += size;
         }
 
@@ -59,12 +58,8 @@ impl LoadPackage {
     pub fn count(&self) -> usize {
         self.items.len()
     }
-}
 
-impl Index<usize> for LoadPackage {
-    type Output = Vec<u8>;
-
-    fn index(&self, index: usize) -> &Self::Output {
-        &self.items[index]
+    pub fn take(&mut self, index: usize) -> Option<Vec<u8>> {
+        self.items[index].take()
     }
 }

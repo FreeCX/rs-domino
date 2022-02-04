@@ -1,9 +1,11 @@
+use std::array::TryFromSliceError;
 use std::fmt;
 use std::io;
 
 #[derive(Debug)]
 pub enum Error {
     Io(io::Error),
+    TryFrom(TryFromSliceError),
     Other(OtherError),
 }
 
@@ -19,6 +21,7 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Error::Io(ref e) => e.fmt(f),
+            Error::TryFrom(ref e) => e.fmt(f),
             Error::Other(ref e) => e.fmt(f),
         }
     }
@@ -44,5 +47,11 @@ impl From<OtherError> for Error {
 impl From<io::Error> for Error {
     fn from(error: io::Error) -> Self {
         Error::Io(error)
+    }
+}
+
+impl From<TryFromSliceError> for Error {
+    fn from(error: TryFromSliceError) -> Self {
+        Error::TryFrom(error)
     }
 }
