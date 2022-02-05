@@ -1,1 +1,4 @@
 /target
+*.package
+src/resource.rs
+src/build.rs

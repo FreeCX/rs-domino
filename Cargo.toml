@@ -1,0 +1,20 @@
+[package]
+name = "rs-domino"
+version = "0.1.0"
+edition = "2021"
+authors = ["Alexey Golubev <dr.freecx@gmail.com>"]
+build = "build.rs"
+
+[features]
+pack = []
+
+[build-dependencies]
+package = { path = "modules/package" }
+chrono = "0.4"
+
+[dependencies]
+framework = { path = "modules/framework" }
+package = { path = "modules/package" }
+
+[profile.pack]
+inherits = "release"
