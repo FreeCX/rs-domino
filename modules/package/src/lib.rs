@@ -6,5 +6,5 @@ mod load;
 
 // re-export
 pub use create::CreatePackage;
-pub use error::Error;
+pub use error::{Result, Error};
 pub use load::LoadPackage;

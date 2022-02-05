@@ -52,8 +52,8 @@ impl fmt::Display for OtherError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             OtherError::IncorrectFormat(line) => write!(f, "Incorrect item format at line {line}"),
-            OtherError::EmptyParentPath => write!(f, "List file does not have parent"),
-            OtherError::InvalidFileSize => write!(f, "Invalid file size"),
+            OtherError::EmptyParentPath => write!(f, "File from list does not have parent"),
+            OtherError::InvalidFileSize => write!(f, "File size is too small"),
             OtherError::InvalidFileFormat => write!(f, "Invalid file format"),
             OtherError::CorruptedData => write!(f, "Package data is corrupted"),
         }

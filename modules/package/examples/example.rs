@@ -1,8 +1,8 @@
 extern crate package;
 
-use package::{CreatePackage, Error, LoadPackage};
+use package::{CreatePackage, Result, LoadPackage};
 
-fn main() -> Result<(), Error> {
+fn main() -> Result<()> {
     let list_file = "examples/resource.list";
     let output_file = "examples/resource.package";
 
