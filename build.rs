@@ -24,17 +24,13 @@ enum Repr {
 
 impl From<io::Error> for BuildError {
     fn from(error: io::Error) -> Self {
-        BuildError {
-            repr: Repr::Io(error),
-        }
+        BuildError { repr: Repr::Io(error) }
     }
 }
 
 impl From<string::FromUtf8Error> for BuildError {
     fn from(error: string::FromUtf8Error) -> Self {
-        BuildError {
-            repr: Repr::Parse(error),
-        }
+        BuildError { repr: Repr::Parse(error) }
     }
 }
 
@@ -101,9 +97,7 @@ fn app_packages() -> io::Result<String> {
         }
     }
 
-    Ok(format!(
-        "pub static APP_PACKAGES: [(&str, &str); {counter}] = [\n{packages}];"
-    ))
+    Ok(format!("pub static APP_PACKAGES: [(&str, &str); {counter}] = [\n{packages}];"))
 }
 
 fn get_current_date() -> String {
@@ -130,11 +124,7 @@ fn generate_build_info() -> Result<(), BuildError> {
 
     // add project info
     let git_hash = include_str!(".git/ORIG_HEAD").trim();
-    let git_branch = include_str!(".git/HEAD")
-        .rsplitn(2, '/')
-        .next()
-        .unwrap_or("-")
-        .trim();
+    let git_branch = include_str!(".git/HEAD").rsplitn(2, '/').next().unwrap_or("-").trim();
     let current_build_date = get_current_date();
     let project_info = format!(
         "// project info\n\
