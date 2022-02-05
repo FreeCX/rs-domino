@@ -26,9 +26,9 @@ impl LoadPackage {
         }
 
         // files count
-        let count =
-            u32::from_be_bytes(buffer[MINIMAL_HEADER_LEN..MINIMAL_HEADER_LEN + COUNTER_LEN].try_into()?) as usize;
-        let mut sizes = Vec::new();
+        let count_range = MINIMAL_HEADER_LEN..MINIMAL_HEADER_LEN + COUNTER_LEN;
+        let count = u32::from_be_bytes(buffer[count_range].try_into()?) as usize;
+        let mut sizes = Vec::with_capacity(count);
         let mut total_size = 0;
         for i in 0..count {
             let start = SIZES_LEN * (i + 1);

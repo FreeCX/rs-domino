@@ -23,7 +23,7 @@ fn main() -> Result<()> {
     }
     match pack.take(index) {
         Some(_) => println!("OMG, I have another resource at index {index}!"),
-        None => println!("Ok. Index {index} is empty!"),
+        None => println!("Ok. Data at index {index} is empty!"),
     }
 
     Ok(())
