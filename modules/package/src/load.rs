@@ -14,7 +14,7 @@ impl LoadPackage {
         let file = File::open(filename)?;
         let mut reader = BufReader::new(file);
         let mut buffer = Vec::new();
-        reader.read_to_end(&mut buffer)?;
+        let file_size = reader.read_to_end(&mut buffer)?;
 
         // magic (4 bytes)
         if buffer.len() < MINIMAL_HEADER_LEN {
@@ -35,6 +35,9 @@ impl LoadPackage {
             let end = start + SIZES_LEN;
             let size = u64::from_be_bytes(buffer[start..end].try_into()?) as usize;
             sizes.push(size);
+            if total_size > file_size {
+                return Err(OtherError::CorruptedData.into());
+            }
             total_size += size;
         }
 

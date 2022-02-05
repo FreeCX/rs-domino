@@ -23,6 +23,7 @@ pub enum OtherError {
     EmptyParentPath,
     InvalidFileSize,
     InvalidFileFormat,
+    CorruptedData,
 }
 
 impl fmt::Debug for Error {
@@ -54,6 +55,7 @@ impl fmt::Display for OtherError {
             OtherError::EmptyParentPath => write!(f, "List file does not have parent"),
             OtherError::InvalidFileSize => write!(f, "Invalid file size"),
             OtherError::InvalidFileFormat => write!(f, "Invalid file format"),
+            OtherError::CorruptedData => write!(f, "Package data is corrupted"),
         }
     }
 }
