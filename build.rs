@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 extern crate package;
 
 use std::collections::HashMap;
@@ -153,7 +154,6 @@ fn generate_build_info() -> Result<(), BuildError> {
     Ok(())
 }
 
-#[allow(dead_code)]
 fn pack_resource() -> Result<(), package::Error> {
     // load data
     let bundle = package::CreatePackage::from_list("resources/resource.list")?;
@@ -177,6 +177,7 @@ fn main() -> Result<(), Box<dyn error::Error>> {
     #[cfg(feature = "pack")]
     pack_resource()?;
 
+    #[cfg(profile = "release")]
     generate_build_info()?;
 
     Ok(())
