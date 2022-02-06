@@ -88,7 +88,7 @@ pub fn generate_build_info() -> Result<(), BuildError> {
     source_code.push_str(&app_packages());
 
     // and write to build.rs file
-    File::create("src/build.rs").and_then(|mut file| write!(file, "{source_code}"))?;
+    File::create("src/build.rs").and_then(|mut file| file.write_all(source_code.as_bytes()))?;
 
     Ok(())
 }

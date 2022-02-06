@@ -15,7 +15,7 @@ pub fn pack_resource() -> Result<()> {
         source_code.push_str(&format!("pub static {name}: u16 = {id};\n"));
     }
     // and write it to file
-    File::create("src/resource.rs").and_then(|mut file| write!(file, "{source_code}"))?;
+    File::create("src/resource.rs").and_then(|mut file| file.write_all(source_code.as_bytes()))?;
 
     // don't forget to save bundle file
     bundle.pack("resources/resource.package")?;
