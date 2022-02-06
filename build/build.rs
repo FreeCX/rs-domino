@@ -1,58 +1,9 @@
-#![allow(dead_code)]
-extern crate package;
-
+use crate::consts::GEN_HEADER;
+use crate::error::BuildError;
 use std::collections::HashMap;
-use std::error;
-use std::fmt;
-use std::fs::{read_to_string, File};
-use std::io::{self, Write};
+use std::fs::File;
+use std::io::Write;
 use std::process::Command;
-use std::string;
-
-static GEN_HEADER: &str = include_str!("resources/gen_rs_header.txt");
-
-#[derive(Debug)]
-struct BuildError {
-    repr: Repr,
-}
-
-#[derive(Debug)]
-enum Repr {
-    Io(io::Error),
-    Parse(string::FromUtf8Error),
-}
-
-impl From<io::Error> for BuildError {
-    fn from(error: io::Error) -> Self {
-        BuildError { repr: Repr::Io(error) }
-    }
-}
-
-impl From<string::FromUtf8Error> for BuildError {
-    fn from(error: string::FromUtf8Error) -> Self {
-        BuildError { repr: Repr::Parse(error) }
-    }
-}
-
-impl error::Error for BuildError {
-    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
-        Some(&self.repr)
-    }
-}
-
-impl error::Error for Repr {}
-
-impl fmt::Display for BuildError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        fmt::Debug::fmt(&self.repr, f)
-    }
-}
-
-impl fmt::Display for Repr {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        fmt::Debug::fmt(&self, f)
-    }
-}
 
 // execute app and get stdout
 fn execute(cmd: &str, args: &[&str]) -> Result<String, BuildError> {
@@ -74,15 +25,13 @@ fn parse(s: String) -> HashMap<String, String> {
 }
 
 // get packages info from Cargo.lock
-fn app_packages() -> io::Result<String> {
+fn app_packages() -> String {
     let mut counter = 0;
     let mut name = String::new();
     let mut packages = String::new();
     let mut name_flag = false;
 
-    let data = read_to_string("Cargo.lock")?;
-
-    for line in data.lines() {
+    for line in include_str!("../Cargo.lock").lines() {
         if let Some(data) = line.strip_prefix("name = ") {
             name = data.to_string();
             name_flag = true;
@@ -97,7 +46,7 @@ fn app_packages() -> io::Result<String> {
         }
     }
 
-    Ok(format!("pub static APP_PACKAGES: [(&str, &str); {counter}] = [\n{packages}];"))
+    format!("pub static APP_PACKAGES: [(&str, &str); {counter}] = [\n{packages}];")
 }
 
 fn get_current_date() -> String {
@@ -106,7 +55,7 @@ fn get_current_date() -> String {
     utc.format("%Y-%m-%d %H:%M:%S %z").to_string()
 }
 
-fn generate_build_info() -> Result<(), BuildError> {
+pub fn generate_build_info() -> Result<(), BuildError> {
     let mut source_code = String::new();
     // file header
     source_code.push_str(GEN_HEADER);
@@ -123,8 +72,8 @@ fn generate_build_info() -> Result<(), BuildError> {
     }
 
     // add project info
-    let git_hash = include_str!(".git/ORIG_HEAD").trim();
-    let git_branch = include_str!(".git/HEAD").rsplitn(2, '/').next().unwrap_or("-").trim();
+    let git_hash = include_str!("../.git/ORIG_HEAD").trim();
+    let git_branch = include_str!("../.git/HEAD").rsplitn(2, '/').next().unwrap_or("-").trim();
     let current_build_date = get_current_date();
     let project_info = format!(
         "// project info\n\
@@ -136,39 +85,10 @@ fn generate_build_info() -> Result<(), BuildError> {
     source_code.push_str(&project_info);
 
     // add packages in Cargo.lock
-    source_code.push_str(&app_packages()?);
+    source_code.push_str(&app_packages());
 
     // and write to build.rs file
     File::create("src/build.rs").and_then(|mut file| write!(file, "{source_code}"))?;
-
-    Ok(())
-}
-
-fn pack_resource() -> Result<(), package::Error> {
-    // load data
-    let bundle = package::CreatePackage::from_list("resources/resource.list")?;
-
-    // create index for app
-    let mut source_code = String::new();
-    source_code.push_str(GEN_HEADER);
-    for (id, name) in bundle.build_index() {
-        source_code.push_str(&format!("pub static {name}: u16 = {id};\n"));
-    }
-    // and write it to file
-    File::create("src/resource.rs").and_then(|mut file| write!(file, "{source_code}"))?;
-
-    // don't forget to save bundle file
-    bundle.pack("resources/resource.package")?;
-
-    Ok(())
-}
-
-fn main() -> Result<(), Box<dyn error::Error>> {
-    #[cfg(feature = "pack")]
-    pack_resource()?;
-
-    #[cfg(profile = "release")]
-    generate_build_info()?;
 
     Ok(())
 }
