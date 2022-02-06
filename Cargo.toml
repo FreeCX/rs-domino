@@ -15,6 +15,7 @@ chrono = "0.4"
 [dependencies]
 framework = { path = "modules/framework" }
 package = { path = "modules/package" }
+backtrace = "0.3"
 
 [profile.pack]
 inherits = "release"
