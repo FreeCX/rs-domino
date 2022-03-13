@@ -66,13 +66,13 @@ pub fn generate_build_info() -> Result<(), BuildError> {
     for (prefix, executable) in [("RUST", "rustc"), ("CARGO", "cargo")].iter() {
         let iterator = parse(execute(executable, &["-vV"])?);
         for (k, value) in iterator {
-            let key = k.to_uppercase().replace("-", "_").replace(" ", "_");
+            let key = k.to_uppercase().replace('-', "_").replace(' ', "_");
             source_code.push_str(&format!("pub static {prefix}_{key}: &str = \"{value}\";\n"));
         }
     }
 
     // add project info
-    let git_hash = include_str!("../.git/ORIG_HEAD").trim();
+    let git_hash = &include_str!("../.git/ORIG_HEAD").trim()[..9];
     let git_branch = include_str!("../.git/HEAD").rsplitn(2, '/').next().unwrap_or("-").trim();
     let current_build_date = get_current_date();
     let project_info = format!(

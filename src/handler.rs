@@ -54,8 +54,7 @@ pub fn panic_handler(panic_info: &panic::PanicInfo) {
         let symbol_address = frame.symbol_address();
         backtrace::resolve(ip, |symbol| {
             if let Some(name) = symbol.name() {
-                let symbol_info = format!("\t{}: {} @ {:?}\n", index, name, symbol_address);
-                buffer.push_str(&symbol_info);
+                buffer.push_str(&format!("\t{index}: {name} @ {symbol_address:?}\n"));
                 index += 1;
             }
             if let (Some(filename), Some(line)) = (symbol.filename(), symbol.lineno()) {

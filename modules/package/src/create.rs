@@ -27,8 +27,8 @@ impl CreatePackage {
         };
         for (index, line) in buffer.lines().enumerate() {
             let mut tokens = line.split_whitespace();
-            let identifier = tokens.next().ok_or_else(|| OtherError::IncorrectFormat(index + 1))?;
-            let filename = tokens.next().ok_or_else(|| OtherError::IncorrectFormat(index + 1))?;
+            let identifier = tokens.next().ok_or(OtherError::IncorrectFormat(index + 1))?;
+            let filename = tokens.next().ok_or(OtherError::IncorrectFormat(index + 1))?;
             package.add(identifier, filename);
         }
         Ok(package)
